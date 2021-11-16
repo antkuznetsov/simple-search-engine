@@ -1,5 +1,7 @@
 package search;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 
 public class Main {
@@ -29,19 +31,23 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        Main app = new Main();
+        Main app = new Main(args);
         app.run();
     }
 
-    private void run() {
-        System.out.println("Enter the number of people:");
-        int dataCount = Integer.parseInt(scanner.nextLine());
-
-        System.out.println("Enter all people:");
-        for (int i = 0; i < dataCount; i++) {
-            data.add(scanner.nextLine());
+    public Main(String[] args) {
+        Path path = Path.of(args[1]);
+        try {
+            Scanner scanner = new Scanner(path);
+            while (scanner.hasNext()) {
+                data.add(scanner.nextLine());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
 
+    private void run() {
         boolean isProgramRun = true;
         while (isProgramRun) {
             printMenu();
