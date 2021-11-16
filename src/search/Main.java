@@ -7,6 +7,7 @@ import java.util.*;
 public class Main {
     private final Scanner scanner = new Scanner(System.in);
     private final List<String> data = new ArrayList<>();
+    private final Map<String, Set<Integer>> index = new HashMap<>();
 
     private enum Action {
         FIND(1),
@@ -39,11 +40,24 @@ public class Main {
         Path path = Path.of(args[1]);
         try {
             Scanner scanner = new Scanner(path);
+            int counter = 0;
             while (scanner.hasNext()) {
-                data.add(scanner.nextLine());
+                String phrase = scanner.nextLine();
+                data.add(phrase);
+                for (String word : phrase.split("\\s+")) {
+                    if (index.containsKey(word)) {
+                        index.get(word).add(counter);
+                    } else {
+                        Set<Integer> positions = new HashSet<>();
+                        positions.add(counter);
+                        index.put(word, positions);
+                    }
+                }
+                counter++;
             }
         } catch (IOException e) {
             e.printStackTrace();
+            System.exit(2);
         }
     }
 
@@ -86,18 +100,11 @@ public class Main {
         System.out.println("Enter data to search people:");
         String query = scanner.nextLine().trim();
 
-        List<String> result = new ArrayList<>();
-
-        for (String el : data) {
-            if (el.toLowerCase().contains(query.toLowerCase())) {
-                result.add(el);
+        if (index.containsKey(query)) {
+            System.out.printf("%s persons found:%n", index.get(query).size());
+            for (int el : index.get(query)) {
+                System.out.println(data.get(el));
             }
-        }
-
-        if (!result.isEmpty()) {
-            System.out.println();
-            System.out.println("Found people:");
-            result.forEach(System.out::println);
         } else {
             System.out.println("No matching people found.");
         }
