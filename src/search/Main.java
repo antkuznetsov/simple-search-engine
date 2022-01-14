@@ -6,8 +6,7 @@ import java.util.*;
 
 public class Main {
     private final Scanner scanner = new Scanner(System.in);
-    private final List<String> data = new ArrayList<>();
-    private final Map<String, Set<Integer>> index = new HashMap<>();
+    private final SearchEngine searchEngine = new SearchEngine();
 
     private enum Action {
         FIND(1),
@@ -40,20 +39,8 @@ public class Main {
         Path path = Path.of(args[1]);
         try {
             Scanner scanner = new Scanner(path);
-            int counter = 0;
             while (scanner.hasNext()) {
-                String phrase = scanner.nextLine();
-                data.add(phrase);
-                for (String word : phrase.split("\\s+")) {
-                    if (index.containsKey(word)) {
-                        index.get(word).add(counter);
-                    } else {
-                        Set<Integer> positions = new HashSet<>();
-                        positions.add(counter);
-                        index.put(word, positions);
-                    }
-                }
-                counter++;
+                searchEngine.addData(scanner.nextLine());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -73,10 +60,10 @@ public class Main {
 
             switch (action) {
                 case FIND:
-                    findPerson();
+                    search();
                     break;
                 case PRINT:
-                    printPeople();
+                    searchEngine.printData("=== List of people ===");
                     break;
                 case EXIT:
                     System.out.println("Bye!");
@@ -95,23 +82,13 @@ public class Main {
         System.out.println("0. Exit.");
     }
 
-    private void findPerson() {
+    private void search() {
+        System.out.println();
+        System.out.println("Select a matching strategy: ALL, ANY, NONE");
+        searchEngine.setSearchStrategy(scanner.nextLine().trim());
+
         System.out.println();
         System.out.println("Enter data to search people:");
-        String query = scanner.nextLine().trim();
-
-        if (index.containsKey(query)) {
-            System.out.printf("%s persons found:%n", index.get(query).size());
-            for (int el : index.get(query)) {
-                System.out.println(data.get(el));
-            }
-        } else {
-            System.out.println("No matching people found.");
-        }
-    }
-
-    private void printPeople() {
-        System.out.println("=== List of people ===");
-        data.forEach(System.out::println);
+        searchEngine.search(scanner.nextLine().trim());
     }
 }
